@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Idea Canvas</title>
+    <link rel="icon" type="image/svg+xml" href="img/favicon.svg"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#296956",
+              secondary: "#765749",
+              "dashboard-action": "#245F50",
+              background: "#f7f9fb",
+              surface: "#f7f9fb",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#f2f4f6",
+              "surface-container": "#eceef0",
+              "surface-container-high": "#e6e8ea",
+              "outline-variant": "#bfc9c3",
+              "on-surface": "#191c1e",
+              "on-surface-variant": "#404945",
+              "primary-container": "#98d8c1",
+              "on-primary-container": "#1e604e",
+              "primary-fixed": "#aff0d8",
+              "primary-fixed-dim": "#94d3bd",
+              "secondary-fixed": "#ffdbcb",
+              "secondary-fixed-dim": "#e6beac",
+              "secondary-container": "#fed4c1",
+              error: "#ba1a1a"
+            },
+            fontFamily: { sans: ["Inter", "sans-serif"] }
+          }
+        }
+      };
+    </script>
+    <style>
+      body { margin: 0; background: #f7f9fb; color: #191c1e; font-family: Inter, sans-serif; }
+      .public-shell { box-sizing: border-box; max-width: 72rem; margin: 0 auto; padding: 2rem 1.25rem; }
+      button, a, input { font-family: inherit; }
+      .fallback-card { border: 1px solid rgba(191, 201, 195, 0.55); border-radius: 0.75rem; background: #fff; box-shadow: 0 4px 20px rgba(25, 28, 30, 0.04); }
+      #boards-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; align-items: stretch; }
+      #boards-list article { box-sizing: border-box; width: 100%; height: 22rem; overflow: hidden; border: 1px solid rgba(191, 201, 195, 0.55); border-radius: 1rem; background: #fff; box-shadow: 0 4px 20px rgba(25, 28, 30, 0.04); }
+      #boards-list article input { box-sizing: border-box; width: 100%; border: 0; border-bottom: 1px solid transparent; background: transparent; color: #191c1e; font-size: 1.25rem; font-weight: 800; }
+      #boards-list article input:focus { border-bottom-color: #296956; outline: none; }
+      @media (max-width: 767px) { #boards-list { grid-template-columns: minmax(0, 1fr); } }
+      @media (min-width: 768px) and (max-width: 1023px) { #boards-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-sans min-h-screen">
+    <main id="public-shell" class="public-shell">
+        <header id="public-dashboard-header" class="flex items-center justify-between gap-4 mb-8">
+            <h1 class="text-4xl font-extrabold tracking-tight">Idea Canvas</h1>
+            <div class="flex items-center gap-2">
+                <div id="dashboard-auth-actions" class="flex items-center gap-2">
+                    <button id="dashboard-open-login-btn" type="button" class="rounded-lg bg-surface-container-high px-4 py-2 text-sm font-bold text-on-surface hover:opacity-90">로그인</button>
+                    <button id="dashboard-open-signup-btn" type="button" class="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:opacity-90">교사 가입</button>
+                </div>
+                <div id="dashboard-auth-logged-in" class="hidden items-center gap-3">
+                    <p id="dashboard-user-display" class="max-w-56 truncate text-sm font-bold"></p>
+                    <button id="dashboard-logout-btn" type="button" class="rounded-lg border border-outline-variant px-3 py-2 text-xs font-bold">로그아웃</button>
+                </div>
+            </div>
+        </header>
+
+        <section id="dashboard-auth-card" class="hidden fixed inset-0 z-50 place-items-center bg-[#213145]/35 p-4 backdrop-blur-sm">
+            <div class="fallback-card w-full max-w-md rounded-xl bg-surface-container-lowest/95 p-5 shadow-2xl shadow-primary/10">
+                <div id="dashboard-auth-logged-out" class="hidden space-y-4">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="text-base font-extrabold">로그인</p>
+                        <button id="dashboard-close-auth-btn" type="button" class="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-low" title="닫기">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3">
+                        <input id="dashboard-auth-email" type="email" placeholder="이메일" autocomplete="email" class="rounded-lg border-outline-variant bg-surface-container-low text-sm focus:border-primary focus:ring-primary/20"/>
+                        <input id="dashboard-auth-password" type="password" placeholder="비밀번호" autocomplete="current-password" class="rounded-lg border-outline-variant bg-surface-container-low text-sm focus:border-primary focus:ring-primary/20"/>
+                        <button id="dashboard-login-btn" type="button" class="rounded-lg bg-primary px-4 py-3 text-sm font-extrabold text-white shadow-lg shadow-primary/20 hover:opacity-90">로그인</button>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 border-t border-outline-variant/50 pt-3">
+                        <button id="dashboard-reset-password-btn" type="button" class="text-xs font-bold text-on-surface-variant hover:text-primary">비밀번호 재설정</button>
+                        <button id="dashboard-show-signup-btn" type="button" class="text-xs font-bold text-primary hover:opacity-80">교사 가입</button>
+                    </div>
+                </div>
+
+                <div id="dashboard-auth-signup" class="hidden space-y-4">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="text-base font-extrabold">교사 가입</p>
+                        <button id="dashboard-show-login-btn" type="button" class="text-xs font-bold text-primary hover:opacity-80">로그인</button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3">
+                        <input id="dashboard-auth-name" type="text" placeholder="이름" autocomplete="name" class="rounded-lg border-outline-variant bg-surface-container-low text-sm focus:border-primary focus:ring-primary/20"/>
+                        <input id="dashboard-signup-email" type="email" placeholder="이메일" autocomplete="email" class="rounded-lg border-outline-variant bg-surface-container-low text-sm focus:border-primary focus:ring-primary/20"/>
+                        <input id="dashboard-signup-password" type="password" placeholder="비밀번호" autocomplete="new-password" class="rounded-lg border-outline-variant bg-surface-container-low text-sm focus:border-primary focus:ring-primary/20"/>
+                        <input id="dashboard-signup-password-confirm" type="password" placeholder="비밀번호 확인" autocomplete="new-password" class="rounded-lg border-outline-variant bg-surface-container-low text-sm focus:border-primary focus:ring-primary/20"/>
+                        <button id="dashboard-signup-btn" type="button" class="rounded-lg border border-primary px-4 py-3 text-sm font-extrabold text-primary hover:bg-surface-container-low">가입 신청</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="landing-preview" class="pt-2 pb-16">
+            <!-- Hero Section -->
+            <div class="text-center py-12 max-w-3xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold mb-5 select-none animate-bounce">
+                    <span class="material-symbols-outlined text-sm">groups</span>
+                    실시간 협업 학급 보드
+                </div>
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-on-surface mb-5 leading-tight">
+                    생각을 자유롭게 공유하고,<br class="sm:hidden"> 배움과 소통을 연결하세요
+                </h2>
+                <p class="text-sm md:text-base text-on-surface-variant leading-relaxed max-w-2xl mx-auto font-medium">
+                    Idea Canvas는 질문 제안, 브레인스토밍, 생각 나눔 및 의견 정리까지 하나의 캔버스에서 실시간으로 함께 만들며 협업하는 최적의 학급 및 강의 지원 공간입니다.
+                </p>
+            </div>
+
+            <!-- 4단계 활동 영역 소개 -->
+            <div class="mb-16">
+                <div class="mb-6 flex items-center gap-2 px-1">
+                    <span class="material-symbols-outlined text-primary text-xl">star</span>
+                    <h3 class="text-lg font-extrabold text-on-surface">학습 및 협업 흐름</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <article class="fallback-card p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/40">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center mb-5">
+                                <span class="material-symbols-outlined text-2xl">help_center</span>
+                            </div>
+                            <h4 class="text-base font-extrabold text-on-surface mb-2">질문 (Question)</h4>
+                            <p class="text-xs text-on-surface-variant leading-relaxed font-medium">학습 중에 궁금증이 생기면 언제든 게시합니다. 실시간 댓글 피드백과 Q&A를 통해 지식을 빠르게 나눕니다.</p>
+                        </div>
+                    </article>
+                    <article class="fallback-card p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/40">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mb-5">
+                                <span class="material-symbols-outlined text-2xl">emoji_objects</span>
+                            </div>
+                            <h4 class="text-base font-extrabold text-on-surface mb-2">아이디어 (Idea)</h4>
+                            <p class="text-xs text-on-surface-variant leading-relaxed font-medium">창의적인 제안과 아이디어를 메모로 부착합니다. 텍스트부터 이미지, 링크, 스케치 손그림까지 자유롭게 다룹니다.</p>
+                        </div>
+                    </article>
+                    <article class="fallback-card p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/40">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center mb-5">
+                                <span class="material-symbols-outlined text-2xl">forum</span>
+                            </div>
+                            <h4 class="text-base font-extrabold text-on-surface mb-2">토론 (Discussion)</h4>
+                            <p class="text-xs text-on-surface-variant leading-relaxed font-medium">'좋아요' 공감과 댓글 논의로 찬반 토론이나 피드백을 주고받으며, 협업 과정에서 더 나은 방향을 함께 찾아갑니다.</p>
+                        </div>
+                    </article>
+                    <article class="fallback-card p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/40">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center mb-5">
+                                <span class="material-symbols-outlined text-2xl">grid_view</span>
+                            </div>
+                            <h4 class="text-base font-extrabold text-on-surface mb-2">정리 (Organize)</h4>
+                            <p class="text-xs text-on-surface-variant leading-relaxed font-medium">분산된 생각들을 섹션(Kanban Column)별로 분류하거나 최신순, 공감순 등으로 한눈에 정렬하여 수업 내용을 완성합니다.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <!-- 주요 기능 소개 및 프리뷰 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- 기능 목록 -->
+                <div class="lg:col-span-7 bg-white/70 p-6 md:p-8 rounded-2xl border border-outline-variant/30 backdrop-blur-md">
+                    <h3 class="text-xl font-extrabold text-on-surface mb-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">rocket_launch</span>
+                        Idea Canvas 주요 기능
+                    </h3>
+                    <p class="text-xs text-on-surface-variant mb-6 leading-relaxed font-medium">
+                        학급의 성격과 수업 목표에 맞추어 보드를 최적화하고 실시간 소통을 주도해 보세요.
+                    </p>
+                    <ul class="space-y-5">
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary text-xl mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            <div>
+                                <h4 class="text-sm font-extrabold text-on-surface">다채로운 멀티미디어 첨부</h4>
+                                <p class="text-xs text-on-surface-variant mt-1 leading-relaxed font-medium">이미지 업로드와 편리한 복사-붙여넣기(Ctrl+V) 지원, 유튜브 영상 링크 및 일반 웹주소의 미리보기 카드 변환, 드로잉 패드로 직접 그리는 스케치 손그림을 제공합니다.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary text-xl mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            <div>
+                                <h4 class="text-sm font-extrabold text-on-surface">자유로운 뷰 & 실시간 정렬</h4>
+                                <p class="text-xs text-on-surface-variant mt-1 leading-relaxed font-medium">물 흐르듯 빈틈없이 메모가 흐르는 메이슨리(Masonry) 뷰와 정돈된 격자 정렬은 물론, 칸반 형태로 카드를 담을 수 있는 섹션 컬럼 뷰 전환과 최신순/공감(좋아요)순 정렬을 제공합니다.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary text-xl mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            <div>
+                                <h4 class="text-sm font-extrabold text-on-surface">강력한 교사 제어 및 설정</h4>
+                                <p class="text-xs text-on-surface-variant mt-1 leading-relaxed font-medium">보드마다 학생 글쓰기 허용 여부를 즉시 켜고 끌 수 있으며, 학급 상호작용 방식(댓글/좋아요 표시 여부)을 캔버스에서 실시간으로 변경해 통제감 있는 수업을 만듭니다.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary text-xl mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            <div>
+                                <h4 class="text-sm font-extrabold text-on-surface">QR 코드 & 링크 간편 공유</h4>
+                                <p class="text-xs text-on-surface-variant mt-1 leading-relaxed font-medium">각 보드는 QR 코드 생성 및 바로가기 주소 복사를 기본 제공합니다. 스마트 기기 카메라로 스캔 한 번이면 로그인 없이 학생이 바로 참여 가능합니다.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Mock-up Board Preview -->
+                <div class="lg:col-span-5 bg-surface-container-low/70 border border-outline-variant/30 rounded-2xl p-5 shadow-inner max-h-[490px] overflow-y-auto custom-scrollbar select-none">
+                    <div class="flex items-center justify-between border-b border-outline-variant/30 pb-3 mb-4">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+                            <span class="text-xs font-bold text-on-surface-variant ml-1.5">보드 실시간 미리보기 예시</span>
+                        </div>
+                        <span class="text-[10px] font-bold bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">글쓰기 가능</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Mock Memo 1 -->
+                        <div class="bg-white p-4 rounded-xl border border-outline-variant/30 shadow-sm transition-all hover:border-primary/50">
+                            <div class="flex items-start justify-between mb-2 gap-2">
+                                <h5 class="font-extrabold text-xs text-on-surface">인공지능 로봇의 감정에 대해 토론해 봅시다.</h5>
+                                <span class="text-[9px] font-extrabold text-orange-600 bg-orange-50 border border-orange-100 shrink-0 px-1.5 py-0.5 rounded-lg">질문</span>
+                            </div>
+                            <p class="text-[11px] text-on-surface-variant leading-relaxed font-medium font-medium">인공지능이 우리 생활에 미치는 혜택 외에 감정이나 도덕적인 깊이를 온전히 판단할 수 있을까요? 자유롭게 논해보아요.</p>
+                            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-on-surface-variant font-bold">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">chat</span> 댓글 3개</span>
+                                <span class="flex items-center gap-1 text-primary"><span class="material-symbols-outlined text-xs text-primary" style="font-variation-settings: 'FILL' 1;">favorite</span> 좋아요 8개</span>
+                            </div>
+                        </div>
+
+                        <!-- Mock Memo 2 -->
+                        <div class="bg-[#faf7f0] p-4 rounded-xl border border-outline-variant/30 shadow-sm transition-all hover:border-primary/50">
+                            <div class="flex items-start justify-between mb-2 gap-2">
+                                <h5 class="font-extrabold text-xs text-on-surface">친환경 신재생에너지 탐구 자료</h5>
+                                <span class="text-[9px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 shrink-0 px-1.5 py-0.5 rounded-lg">아이디어</span>
+                            </div>
+                            <div class="mb-2 bg-slate-100 rounded-lg h-28 overflow-hidden border border-outline-variant/20 flex items-center justify-center relative">
+                                <img src="img/solar_panel_thumbnail.png" class="w-full h-full object-cover" alt="태양광"/>
+                                <span class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1 select-none">
+                                    <span class="material-symbols-outlined text-xs text-red-400" style="font-variation-settings: 'FILL' 1;">smart_display</span>
+                                    유튜브 첨부
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-on-surface-variant leading-relaxed font-medium">신재생에너지 원리를 설명해주는 다큐멘터리 클립입니다. 수업 중 태양광 패널 원리 학습에 도움이 됩니다.</p>
+                            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-on-surface-variant font-bold">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">chat</span> 댓글 1개</span>
+                                <span class="flex items-center gap-1 text-primary"><span class="material-symbols-outlined text-xs text-primary" style="font-variation-settings: 'FILL' 1;">favorite</span> 좋아요 5개</span>
+                            </div>
+                        </div>
+
+                        <!-- Mock Memo 3 -->
+                        <div class="bg-white p-4 rounded-xl border border-outline-variant/30 shadow-sm transition-all hover:border-primary/50">
+                            <div class="flex items-start justify-between mb-2 gap-2">
+                                <h5 class="font-extrabold text-xs text-on-surface">자율주행 자동차 상상 스케치</h5>
+                                <span class="text-[9px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 shrink-0 px-1.5 py-0.5 rounded-lg">아이디어</span>
+                            </div>
+                            <div class="mb-2 bg-slate-50 border border-dashed border-outline-variant/40 rounded-lg h-24 flex items-center justify-center overflow-hidden">
+                                <img src="img/car_sketch_thumbnail.png" class="max-h-full object-contain" alt="자율주행스케치"/>
+                            </div>
+                            <p class="text-[11px] text-on-surface-variant leading-relaxed font-medium">손그림 드로잉 패드로 구상해본 차세대 자율주행 차량 디자인 초안입니다.</p>
+                            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-on-surface-variant font-bold">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">chat</span> 댓글 0개</span>
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">favorite</span> 좋아요 2개</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <section id="dashboard-workspace" class="hidden min-h-screen w-full bg-background">
+        <aside id="dashboard-sidebar" class="hidden w-72 shrink-0 flex-col border-r border-outline-variant/40 bg-surface-container-lowest px-6 py-7 md:flex">
+            <div class="mb-10 flex items-center gap-3 px-2">
+                <span class="grid size-10 place-items-center rounded-xl bg-primary text-white shadow-sm">
+                    <span class="material-symbols-outlined">lightbulb</span>
+                </span>
+                <div>
+                    <p class="text-lg font-extrabold tracking-tight text-on-surface">Idea Canvas</p>
+                    <p class="text-xs font-medium text-on-surface-variant">Teacher workspace</p>
+                </div>
+            </div>
+
+            <nav class="space-y-2" aria-label="대시보드 메뉴">
+                <button id="boards-tab-btn" type="button" data-tab="boards" class="flex w-full items-center gap-3 rounded-xl bg-primary px-4 py-3 text-left text-sm font-bold text-white">
+                    <span class="material-symbols-outlined text-xl">dashboard</span>보드
+                </button>
+                <button id="accounts-tab-btn" type="button" data-tab="accounts" class="hidden w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold text-on-surface-variant hover:bg-surface-container-low">
+                    <span class="material-symbols-outlined text-xl">manage_accounts</span>계정 관리
+                </button>
+            </nav>
+
+            <div class="mt-auto border-t border-outline-variant/40 pt-5">
+                <div id="dashboard-sidebar-user-slot" class="rounded-xl bg-primary/10 p-3"></div>
+            </div>
+        </aside>
+
+        <div class="min-w-0 flex-1">
+            <header id="dashboard-topbar" class="sticky top-0 z-20 flex min-h-20 items-center gap-3 border-b border-outline-variant/40 bg-surface-container-lowest/95 px-4 py-3 backdrop-blur md:px-8">
+                <div class="flex items-center gap-1 md:hidden">
+                    <button type="button" data-mobile-tab="boards" class="rounded-lg bg-primary px-3 py-2 text-sm font-bold text-white">보드</button>
+                    <button type="button" data-mobile-tab="accounts" class="hidden rounded-lg px-3 py-2 text-sm font-bold text-on-surface-variant">계정</button>
+                </div>
+                <div class="relative ml-auto hidden w-full max-w-md md:block">
+                    <label class="sr-only" for="board-search-input">보드 검색</label>
+                    <span class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xl text-on-surface-variant">search</span>
+                    <input id="board-search-input" type="search" placeholder="보드 검색" class="w-full rounded-xl border-outline-variant/70 bg-surface-container-low pl-10 pr-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-primary/20"/>
+                </div>
+                <button id="create-board-btn" type="button" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-dashboard-action px-4 py-3 text-sm font-bold text-white shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 md:px-5">
+                    <span class="material-symbols-outlined text-lg">add</span><span class="hidden sm:inline">새 보드</span>
+                </button>
+            </header>
+
+            <main class="mx-auto w-full max-w-[1440px] px-4 py-7 md:px-8 md:py-9">
+                <section id="boards-panel">
+                <section id="recent-boards-section" class="mb-8">
+                    <div class="mb-3 flex items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-on-surface">최근 보드</h2>
+                            <p class="mt-1 text-xs text-on-surface-variant">마지막 메모가 등록된 순서입니다.</p>
+                        </div>
+                        <span class="material-symbols-outlined text-2xl text-primary">history</span>
+                    </div>
+                    <div id="recent-boards-list" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4"></div>
+                </section>
+                <div class="mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-xl text-primary">dashboard</span>
+                    <h2 class="text-lg font-extrabold text-on-surface">전체 보드</h2>
+                </div>
+                <section id="boards-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></section>
+                <p id="boards-status" class="text-sm text-on-surface-variant mt-5"></p>
+                </section>
+
+                <section id="accounts-panel" class="hidden space-y-5">
+                <div class="fallback-card p-5">
+                    <h2 class="text-lg font-extrabold mb-4">승인 대기 교사</h2>
+                    <div id="pending-teachers-list" class="space-y-2 text-sm text-on-surface-variant"></div>
+                </div>
+                <div class="fallback-card p-5">
+                    <h2 class="text-lg font-extrabold mb-4">교사 및 마스터</h2>
+                    <div id="approved-teachers-list" class="space-y-2 text-sm text-on-surface-variant"></div>
+                </div>
+                <div class="fallback-card p-5">
+                    <h2 class="text-lg font-extrabold mb-4">가입 거부 교사</h2>
+                    <div id="rejected-teachers-list" class="space-y-2 text-sm text-on-surface-variant"></div>
+                </div>
+                </section>
+            </main>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase_config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js?v=1.0.1"></script>
+    <script src="js/boards.js"></script>
+    <script src="js/board-settings-utils.js"></script>
+    <script src="js/board-settings.js"></script>
+    <script src="js/boards-page.js?v=1.0.1"></script>
+</body>
+</html>

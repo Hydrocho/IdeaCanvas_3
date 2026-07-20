@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <!-- 배경 그라데이션: 테마 컬러인 보라색 기반 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8a3ffc" />
+      <stop offset="100%" stop-color="#630ed4" />
+    </linearGradient>
+    <!-- 전구 글로우 효과 -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- 둥근 모서리 사각형 배경 (App Icon 스타일) -->
+  <rect width="100" height="100" rx="24" fill="url(#bgGrad)" />
+  
+  <!-- 아이디어 전구 & 예술 캔버스 심볼 -->
+  <!-- 1. 빛 방사 효과 (스파크) -->
+  <path d="M 50 15 L 50 21 M 25 40 L 19 37 M 75 40 L 81 37 M 32 22 L 28 17 M 68 22 L 72 17" 
+        stroke="#ffd700" stroke-width="3" stroke-linecap="round" opacity="0.8" />
+        
+  <!-- 2. 물감 팔레트/색상 아치 (전구를 감싸는 형태) -->
+  <path d="M 28 65 A 28 28 0 1 1 72 65" fill="none" stroke="#ff3b30" stroke-width="4" stroke-linecap="round" opacity="0.3"/>
+  <path d="M 32 65 A 24 24 0 1 1 68 65" fill="none" stroke="#34c759" stroke-width="4" stroke-linecap="round" opacity="0.3"/>
+  <path d="M 36 65 A 20 20 0 1 1 64 65" fill="none" stroke="#007aff" stroke-width="4" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- 3. 전구 몸체 (노란빛 그라데이션) -->
+  <!-- 전구 머리 -->
+  <path d="M 35 48 C 35 37, 65 37, 65 48 C 65 56, 57 60, 57 66 L 43 66 C 43 60, 35 56, 35 48 Z" 
+        fill="#ffdf00" filter="url(#glow)" />
+  <!-- 전구 아웃라인 -->
+  <path d="M 35 48 C 35 37, 65 37, 65 48 C 65 56, 57 60, 57 66 L 43 66 C 43 60, 35 56, 35 48 Z" 
+        fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round" />
+  
+  <!-- 4. 전구 소켓 (금속 부품) -->
+  <path d="M 44 66 L 56 66 M 45 70 L 55 70 M 47 74 L 53 74" 
+        stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+  <path d="M 49 74 C 49 77, 51 77, 51 74 Z" fill="#ffffff" />
+
+  <!-- 5. 전구 안의 필라멘트 (하트 혹은 크리에이티브 라인) -->
+  <path d="M 46 52 Q 50 45 50 48 Q 50 45 54 52" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+  
+  <!-- 6. 팔레트 물감 방울 포인트 (전구 주변에 창의적 영감으로 흩뿌려진 색상 방울) -->
+  <circle cx="28" cy="30" r="3.5" fill="#ff2d55" />
+  <circle cx="74" cy="28" r="4.5" fill="#007aff" />
+  <circle cx="76" cy="52" r="3" fill="#34c759" />
+  <circle cx="23" cy="54" r="4" fill="#ff9500" />
+</svg>

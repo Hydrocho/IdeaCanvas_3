@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IdeaCanvas | 보드 공유 QR 코드</title>
+    <link rel="icon" type="image/svg+xml" href="img/favicon.svg"/>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background-color: #f8f9fc;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-6 text-center text-slate-800 animate-fade-in">
+
+    <!-- Main Content (QR Code Display) -->
+    <div class="flex-1 flex flex-col items-center justify-center max-w-2xl w-full my-4 space-y-6">
+        <div>
+            <span class="text-[10px] font-bold bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full uppercase tracking-wider">Classroom TV Projector View</span>
+            <h1 id="board-title" class="text-2xl md:text-4xl font-black text-slate-900 mt-2 tracking-tight leading-tight">새로운 생각</h1>
+        </div>
+
+        <!-- Big QR Code Panel -->
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 flex flex-col items-center justify-center max-w-sm md:max-w-md w-full transition-transform hover:scale-[1.01]">
+            <canvas id="qr-canvas" class="bg-white p-3 rounded-2xl shadow-inner max-w-full aspect-square w-[320px] md:w-[400px]"></canvas>
+            
+            <button id="download-btn" class="mt-4 px-5 py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all shadow-lg flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">download</span>
+                <span>QR 코드 이미지 다운로드</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer (URL display & copy) -->
+    <div class="w-full max-w-md bg-slate-100/80 backdrop-blur border border-slate-200/50 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-3 mt-4">
+        <div class="flex-1 min-w-0 text-left">
+            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">접속 링크 주소</p>
+            <p id="url-text" class="text-xs font-bold text-slate-700 truncate select-all"></p>
+        </div>
+        <button id="copy-btn" class="w-full md:w-auto px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 active:scale-95 transition-all rounded-lg text-xs font-bold flex items-center justify-center gap-1 shadow-sm">
+            <span class="material-symbols-outlined text-sm text-slate-500">content_copy</span>
+            <span>링크 복사</span>
+        </button>
+    </div>
+
+    <script>
+        // Parse params
+        const params = new URLSearchParams(window.location.search);
+        const targetUrl = params.get('url') || window.location.origin + window.location.pathname;
+        const boardTitle = params.get('title') || '아이디어 협업 보드';
+
+        document.getElementById('board-title').textContent = boardTitle;
+        document.getElementById('url-text').textContent = targetUrl;
+
+        // Render QR
+        const canvas = document.getElementById('qr-canvas');
+        const qr = new QRious({
+            element: canvas,
+            value: targetUrl,
+            size: 600 // High resolution size inside the canvas context
+        });
+
+        // Copy Link
+        const copyBtn = document.getElementById('copy-btn');
+        copyBtn.addEventListener('click', () => {
+            const originalHtml = copyBtn.innerHTML;
+            
+            const showSuccessState = () => {
+                copyBtn.innerHTML = `
+                    <span class="material-symbols-outlined text-base text-emerald-500">check_circle</span>
+                    <span class="text-emerald-600 font-bold">복사 완료</span>
+                `;
+                copyBtn.classList.add('border-emerald-200', 'bg-emerald-50/50');
+                copyBtn.classList.remove('border-slate-300', 'hover:bg-slate-50');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHtml;
+                    copyBtn.classList.remove('border-emerald-200', 'bg-emerald-50/50');
+                    copyBtn.classList.add('border-slate-300', 'hover:bg-slate-50');
+                }, 2000);
+            };
+
+            navigator.clipboard.writeText(targetUrl).then(() => {
+                showSuccessState();
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                const input = document.createElement('input');
+                input.value = targetUrl;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showSuccessState();
+            });
+        });
+
+        // Download QR
+        document.getElementById('download-btn').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = `ideacanvas-qr-${boardTitle}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    </script>
+</body>
+</html>

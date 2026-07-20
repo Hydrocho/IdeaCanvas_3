@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>IdeaCanvas | 아이디어 협업 보드</title>
+    <link rel="icon" type="image/svg+xml" href="img/favicon.svg"/>
+    <!-- Tailwind CSS & Plugins via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind Configuration (Stitch 디자인 시스템 이식) -->
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#ccc3d8",
+                    "surface": "#f8f9ff",
+                    "surface-tint": "#732ee4",
+                    "outline": "#7b7487",
+                    "on-secondary-container": "#753b83",
+                    "error-container": "#ffdad6",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-primary-fixed": "#25005a",
+                    "secondary-container": "#f3aeff",
+                    "tertiary": "#275467",
+                    "primary-fixed": "#eaddff",
+                    "on-primary-fixed-variant": "#5a00c6",
+                    "on-tertiary-fixed": "#001f2a",
+                    "tertiary-fixed": "#bee9ff",
+                    "on-background": "#0b1c30",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-tertiary-container": "#c6ebff",
+                    "surface-container-high": "#dce9ff",
+                    "on-surface": "#0b1c30",
+                    "on-surface-variant": "#4a4455",
+                    "on-secondary-fixed": "#340042",
+                    "background": "#f8f9ff",
+                    "surface-dim": "#cbdbf5",
+                    "on-primary": "#ffffff",
+                    "primary": "#630ed4",
+                    "tertiary-fixed-dim": "#a1cde3",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed-variant": "#1e4c5f",
+                    "secondary": "#824790",
+                    "primary-container": "#7c3aed",
+                    "surface-container-low": "#eff4ff",
+                    "inverse-primary": "#d2bbff",
+                    "on-secondary-fixed-variant": "#682f76",
+                    "secondary-fixed-dim": "#f3aeff",
+                    "surface-bright": "#f8f9ff",
+                    "inverse-surface": "#213145",
+                    "surface-container": "#e5eeff",
+                    "on-secondary": "#ffffff",
+                    "surface-variant": "#d3e4fe",
+                    "tertiary-container": "#416c80",
+                    "on-primary-container": "#ede0ff",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed-dim": "#d2bbff",
+                    "secondary-fixed": "#fcd6ff",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-padding-mobile": "16px",
+                    "container-padding-desktop": "40px",
+                    "gutter": "24px",
+                    "card-gap": "20px",
+                    "unit": "8px"
+            },
+            "fontFamily": {
+                    "display-lg-mobile": ["Plus Jakarta Sans"],
+                    "label-md": ["Inter"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-sm": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "display-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "display-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .canvas-bg {
+            background-size: 24px 24px;
+            transition: background 0.3s ease;
+        }
+        .bg-preset-default {
+            background-color: #f8f9ff;
+            background-image: radial-gradient(#d3e4fe 1.5px, transparent 1.5px);
+        }
+        .bg-preset-cream {
+            background-color: #faf7f0;
+            background-image: radial-gradient(#e4dac5 1.5px, transparent 1.5px);
+        }
+        .bg-preset-green {
+            background-color: #f1f6f2;
+            background-image: radial-gradient(#cbdccb 1.5px, transparent 1.5px);
+        }
+        .bg-preset-pink {
+            background-color: #faf0ee;
+            background-image: radial-gradient(#ecc4ba 1.5px, transparent 1.5px);
+        }
+        .bg-preset-purple {
+            background-color: #f6f3f8;
+            background-image: radial-gradient(#ded4ea 1.5px, transparent 1.5px);
+        }
+        #main-canvas header {
+            transition: background-color 0.3s ease;
+        }
+        #main-canvas.bg-preset-default header {
+            background-color: rgba(248, 249, 255, 0.8) !important;
+        }
+        #main-canvas.bg-preset-cream header {
+            background-color: rgba(250, 247, 240, 0.8) !important;
+        }
+        #main-canvas.bg-preset-green header {
+            background-color: rgba(241, 246, 242, 0.8) !important;
+        }
+        #main-canvas.bg-preset-pink header {
+            background-color: rgba(250, 240, 238, 0.8) !important;
+        }
+        #main-canvas.bg-preset-purple header {
+            background-color: rgba(246, 243, 248, 0.8) !important;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d3e4fe; border-radius: 10px; }
+        .clickable-note-img {
+            cursor: zoom-in;
+            transition: opacity 0.2s ease;
+        }
+        .clickable-note-img:hover {
+            opacity: 0.92;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #732ee4; }
+        
+        /* Masonry Grid */
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+        @media (min-width: 640px) {
+            .masonry-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        @media (min-width: 1280px) {
+            .masonry-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+        .masonry-column { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+        .masonry-item {
+            display: block;
+            width: 100%;
+        }
+
+        /* 펜 그리기 관련 스타일 */
+        canvas {
+            cursor: crosshair;
+        }
+    </style>
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container custom-scrollbar">
+    <div class="flex h-screen w-full overflow-hidden">
+        
+        <!-- Sidebar (사이드바 메뉴) -->
+        <aside class="h-screen w-72 hidden flex-col border-r border-outline-variant/30 bg-surface-container-low p-6 gap-y-4 shrink-0">
+            <div class="flex items-center gap-3 px-2 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined text-2xl">dashboard</span>
+                </div>
+                <div>
+                    <h1 class="font-headline-sm text-headline-sm text-on-surface leading-tight">IdeaCanvas</h1>
+                    <p class="text-on-surface-variant font-label-md text-label-md">Creative Workspace</p>
+                </div>
+            </div>
+            
+
+            
+            <nav class="flex-1 space-y-2">
+                <a class="bg-secondary-container text-on-secondary-container rounded-xl font-semibold flex items-center gap-3 p-3 transition-all" href="#">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                    <span class="font-label-md text-label-md">전체 보드</span>
+                </a>
+                <a class="text-on-surface-variant hover:bg-surface-variant/50 rounded-xl flex items-center gap-3 p-3 transition-all hover:translate-x-1" href="#" onclick="alert('데모용 고정 메뉴입니다.')">
+                    <span class="material-symbols-outlined">group</span>
+                    <span class="font-label-md text-label-md">공유된 보드</span>
+                </a>
+                <a class="text-on-surface-variant hover:bg-surface-variant/50 rounded-xl flex items-center gap-3 p-3 transition-all hover:translate-x-1" href="#" onclick="alert('데모용 고정 메뉴입니다.')">
+                    <span class="material-symbols-outlined">star</span>
+                    <span class="font-label-md text-label-md">즐겨찾기</span>
+                </a>
+            </nav>
+            
+        </aside>
+
+        <!-- Main Content Area -->
+        <main id="main-canvas" class="flex-1 min-h-screen canvas-bg flex flex-col overflow-y-auto overflow-x-hidden custom-scrollbar relative">
+            <!-- Top Bar -->
+            <header class="w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20 h-[50px] flex items-center justify-between px-container-padding-mobile md:px-container-padding-desktop">
+                <div class="flex items-center gap-4">
+                    <span class="md:hidden">
+                        <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+                            <span class="material-symbols-outlined text-sm">dashboard</span>
+                        </div>
+                    </span>
+                    <div id="board-title-container" class="flex items-center gap-2">
+                        <h2 id="board-title" class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary tracking-tight font-bold select-none">새로운 생각</h2>
+                        <input id="board-title-input" class="hidden font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary tracking-tight font-bold bg-transparent border-b-2 border-primary outline-none py-0.5 px-1 focus:ring-0 w-48 md:w-64" type="text" value="새로운 생각"/>
+                        <span class="material-symbols-outlined text-primary text-sm opacity-0 group-hover:opacity-60 transition-opacity hidden">edit</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4 md:gap-6">
+                    <!-- 확장 가능한 검색바 -->
+                    <div id="search-bar-container" class="relative flex items-center justify-end">
+                        <input id="search-input" class="bg-surface-container-low border border-outline-variant/30 rounded-full py-1.5 pl-4 pr-10 text-xs focus:ring-2 focus:ring-primary/20 outline-none w-0 opacity-0 transition-all duration-300 ease-out" placeholder="노트 검색..." type="text"/>
+                        <button id="search-toggle-btn" class="absolute right-1 p-2 text-on-surface-variant hover:bg-surface-container-highest/60 rounded-full transition-colors active:scale-95 flex items-center justify-center" title="검색">
+                            <span class="material-symbols-outlined text-xl">search</span>
+                        </button>
+                    </div>
+
+                    <!-- 교사 계정 단추 및 드롭다운 -->
+                    <div class="relative">
+                        <span id="auth-status-badge" class="hidden absolute right-10 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-800"></span>
+                        <button id="auth-menu-btn" class="p-2 text-on-surface-variant hover:bg-surface-container-highest/60 rounded-full transition-colors active:scale-95 flex items-center justify-center" title="교사 계정 관리">
+                            <span class="material-symbols-outlined text-xl">account_circle</span>
+                        </button>
+                        <!-- 드롭다운 메뉴 카드 -->
+                        <div id="auth-dropdown-menu" class="absolute right-0 mt-2 w-64 bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-xl p-4 hidden z-50 flex flex-col gap-3">
+                            <h5 class="font-semibold text-on-surface flex items-center gap-1.5 text-xs text-outline border-b border-outline-variant/10 pb-2 select-none">
+                                <span class="material-symbols-outlined text-base">person</span>
+                                교사 계정 관리
+                            </h5>
+                            
+                            <!-- 비로그인 상태 폼 -->
+                            <div id="auth-logged-out" class="space-y-2.5">
+                                <input id="auth-email" type="email" placeholder="이메일 주소" class="w-full px-3 py-2 bg-slate-50 border border-outline-variant/30 rounded-lg text-xs outline-none focus:ring-1 focus:ring-primary"/>
+                                <input id="auth-password" type="password" placeholder="비밀번호" class="w-full px-3 py-2 bg-slate-50 border border-outline-variant/30 rounded-lg text-xs outline-none focus:ring-1 focus:ring-primary"/>
+                                <button type="button" id="btn-login" class="w-full bg-primary text-on-primary py-2 rounded-lg text-xs font-semibold hover:bg-primary/95 transition-all">로그인</button>
+                                <button type="button" id="btn-reset-password" class="w-full text-[10px] font-semibold text-on-surface-variant hover:text-primary text-center">비밀번호 재설정 메일 보내기</button>
+                            </div>
+                            
+                            <!-- 로그인 상태 표시 -->
+                            <div id="auth-logged-in" class="hidden flex items-center justify-between p-2.5 bg-primary-container/10 rounded-xl gap-2">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="material-symbols-outlined text-primary text-xl">account_circle</span>
+                                    <div class="min-w-0">
+                                        <span id="user-email-display" class="font-bold text-xs truncate text-on-surface block max-w-[130px]"></span>
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-logout" class="w-8 h-8 border border-error/30 text-error hover:bg-error-container/10 rounded-lg transition-all flex items-center justify-center shrink-0" title="로그아웃">
+                                    <span class="material-symbols-outlined text-base">logout</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 설정 단추 -->
+                    <a id="board-home-link" href="index.html" class="hidden rounded-full px-3 py-1.5 text-xs font-bold text-on-surface-variant hover:bg-surface-container-highest/60 hover:text-primary transition-colors">Home</a>
+                    <button id="open-settings-panel-btn" class="p-2 text-on-surface-variant hover:bg-surface-container-highest/60 rounded-full transition-colors active:scale-95 flex items-center justify-center ml-1" title="보드 설정">
+                        <span class="material-symbols-outlined text-xl">settings</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="flex-1 p-container-padding-mobile md:p-container-padding-desktop pb-24 w-full max-w-full overflow-x-hidden min-w-0">
+                
+
+
+
+
+                <!-- Board Card Grid -->
+                <section id="notes-grid" class="masonry-grid">
+                    
+
+
+                    <!-- 동적으로 생성된 메모 카드들이 이곳에 렌더링됩니다 -->
+                </section>
+
+                <!-- 칸반 컬럼 보드 (기본 숨김) -->
+                <section id="kanban-board" class="hidden flex flex-row gap-6 items-start overflow-x-auto pb-6 custom-scrollbar w-full min-w-0">
+                    <!-- 동적으로 생성된 섹션 컬럼들과 "섹션 추가" 카드가 렌더링됩니다 -->
+                </section>
+                <div id="kanban-scroll-proxy" class="hidden fixed inset-x-0 bottom-0 z-30 overflow-x-auto bg-surface/95 backdrop-blur border-t border-outline-variant/20 custom-scrollbar" aria-label="칸반 보드 가로 스크롤">
+                    <div id="kanban-scroll-proxy-content" class="h-3"></div>
+                </div>
+            </div>
+
+            <!-- Floating Action Button (FAB) -->
+            <button id="fab-new-note-btn" class="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary text-on-primary shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40" title="새 메모 작성">
+                <span class="material-symbols-outlined text-3xl">create</span>
+            </button>
+        </main>
+    </div>
+
+
+
+    <!-- 글쓰기 비활성 안내 모달 -->
+    <div id="write-disabled-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 hidden">
+        <div class="absolute inset-0 bg-black/35 backdrop-blur-sm write-disabled-close-trigger"></div>
+        <div class="relative w-full max-w-sm rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-6 shadow-2xl animate-modal">
+            <div class="mb-4 flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-container text-primary">
+                    <span class="material-symbols-outlined">edit_off</span>
+                </div>
+                <h3 class="text-lg font-extrabold text-on-surface">글쓰기가 꺼져 있습니다.</h3>
+            </div>
+            <p class="text-sm leading-6 text-on-surface-variant">
+                교사가 글쓰기를 허용해야 생각을 작성할 수 있습니다.
+            </p>
+            <button type="button" id="write-disabled-close-btn" class="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white hover:opacity-90">
+                확인
+            </button>
+        </div>
+    </div>
+
+    <!-- 댓글 작성 모달 -->
+    <div id="comment-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm comment-modal-close-trigger"></div>
+        <!-- Modal Content -->
+        <div class="relative w-full max-w-sm bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden border border-outline-variant/15 flex flex-col animate-modal max-h-[90vh]">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant/10">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-xl">chat_bubble</span>
+                    <span class="font-extrabold text-on-surface text-base">댓글 작성하기</span>
+                </div>
+                <button type="button" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-container-low hover:text-primary transition-all text-on-surface-variant comment-modal-close-btn" title="닫기">
+                    <span class="material-symbols-outlined text-lg">close</span>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-5 space-y-4 overflow-y-auto">
+                <div class="space-y-1.5">
+                    <label for="comment-author-input" class="text-xs font-bold text-on-surface-variant">작성자 이름</label>
+                    <input id="comment-author-input" type="text" placeholder="이름을 입력하세요 (필수)" class="w-full rounded-xl border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-0 focus:outline-none"/>
+                </div>
+                <div class="space-y-1.5">
+                    <label for="comment-content-input" class="text-xs font-bold text-on-surface-variant">댓글 내용</label>
+                    <textarea id="comment-content-input" rows="3" placeholder="댓글을 입력해 주세요..." class="w-full rounded-xl border border-outline-variant/40 bg-surface-container-low px-3 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-0 focus:outline-none resize-none"></textarea>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="px-5 py-4 border-t border-outline-variant/10 flex gap-2">
+                <button type="button" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-on-surface-variant font-bold transition-all active:scale-95 text-xs comment-modal-close-btn">취소</button>
+                <button type="button" id="comment-submit-btn" class="flex-1 px-4 py-3 rounded-xl bg-primary hover:opacity-90 text-white font-bold transition-all active:scale-95 text-xs shadow-md shadow-primary/10">등록</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 워드 클라우드 분석 모달 -->
+    <div id="wordcloud-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/45 backdrop-blur-sm wordcloud-modal-close-trigger"></div>
+        <!-- Modal Content -->
+        <div class="relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden border border-outline-variant/15 flex flex-col animate-modal max-h-[90vh]">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant/10">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-xl">cloud</span>
+                    <span class="font-extrabold text-on-surface text-base">보드 텍스트 워드 클라우드</span>
+                </div>
+                <button type="button" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-container-low hover:text-primary transition-all text-on-surface-variant wordcloud-modal-close-btn" title="닫기">
+                    <span class="material-symbols-outlined text-lg">close</span>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-5 flex flex-col items-center gap-4 overflow-y-auto min-h-[350px]">
+                <!-- Canvas Container -->
+                <div id="wordcloud-canvas-container" class="w-full h-64 bg-slate-50 rounded-xl relative flex items-center justify-center border border-outline-variant/20 overflow-hidden">
+                    <canvas id="wordcloud-canvas" class="w-full h-full"></canvas>
+                    <div id="wordcloud-empty-msg" class="absolute inset-0 flex items-center justify-center text-xs text-on-surface-variant hidden">
+                        분석할 텍스트가 없습니다. 생각을 적거나 댓글을 입력해 주세요.
+                    </div>
+                </div>
+                <!-- Word list/stats -->
+                <div class="w-full space-y-2">
+                    <p class="text-xs font-bold text-on-surface-variant">가장 빈도가 높은 단어 TOP 5</p>
+                    <div id="wordcloud-stats-list" class="grid grid-cols-5 gap-2">
+                        <!-- Stat items loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="px-5 py-4 border-t border-outline-variant/10 flex">
+                <button type="button" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-on-surface-variant font-bold transition-all active:scale-95 text-xs wordcloud-modal-close-btn">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 새 메모 작성 모달 -->
+    <div id="note-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm modal-close-trigger"></div>
+        <!-- Modal Content -->
+        <div class="relative w-full max-w-md bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden border border-outline-variant/15 flex flex-col animate-modal max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="px-5 pt-3 pb-1 border-b border-outline-variant/10 flex items-center justify-between bg-surface-container-lowest">
+                <h3 class="text-base font-bold text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-xl">edit_note</span>
+                    <span id="modal-title">새 생각 기록하기</span>
+                </h3>
+                <button type="button" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-container-low hover:text-primary transition-all text-on-surface-variant modal-close-btn" title="닫기">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+            
+            <div class="px-5 py-2 border-b border-outline-variant/10 bg-error-container/30 text-[10px] font-bold text-on-error-container">제목: 필수 입력</div>
+            <div class="px-5 pt-1 pb-2 border-b border-outline-variant/10 bg-surface-container-lowest">
+                <input id="note-title-fixed" form="note-form" class="w-full px-4 py-3 bg-surface-container-low/40 border border-outline-variant/15 rounded-xl outline-none text-base font-bold transition-all placeholder:text-on-surface-variant/40 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10" placeholder="제목: 필수 입력" type="text" required/>
+            </div>
+            <!-- Body -->
+            <form id="note-form" class="flex-1 overflow-y-auto px-5 pt-1 pb-5 space-y-4 custom-scrollbar">
+                <input type="hidden" id="edit-note-id" value="">
+                <input id="note-author" type="hidden" value="익명"/>
+                
+                <!-- Inputs Group -->
+                <div class="space-y-3">
+                    <div class="relative">
+                        <input id="note-title" class="w-full px-4 py-3 bg-surface-container-low/40 border border-outline-variant/15 rounded-xl outline-none text-base font-bold transition-all placeholder:text-on-surface-variant/40 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10" placeholder="제목을 입력하세요" type="text" required/>
+                    </div>
+                    <div class="relative">
+                        <textarea id="note-content" class="w-full px-4 py-3 bg-surface-container-low/40 border border-outline-variant/15 rounded-xl outline-none text-sm transition-all resize-none placeholder:text-on-surface-variant/40 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10" placeholder="생각을 여기에 자세히 적어보세요..." rows="4"></textarea>
+                    </div>
+                </div>
+
+                <!-- 포스트 첨부 도구 툴바 -->
+                <div class="space-y-2">
+                    <div class="flex flex-col gap-2 p-3 bg-surface-container-low/30 rounded-2xl border border-outline-variant/10">
+                        <span class="text-xs font-bold text-on-surface-variant/80 px-1">자료 추가</span>
+                        <div class="flex items-center gap-1 bg-white/60 p-1 rounded-xl shadow-inner-sm">
+                            <button type="button" id="tool-btn-image" class="flex-1 py-2 text-on-surface-variant hover:text-primary hover:bg-white rounded-lg hover:shadow-sm transition-all flex items-center justify-center gap-1.5 text-xs font-semibold" title="이미지 첨부">
+                                <span class="material-symbols-outlined text-lg">image</span>
+                                <span>이미지</span>
+                            </button>
+                            <button type="button" id="tool-btn-link" class="flex-1 py-2 text-on-surface-variant hover:text-primary hover:bg-white rounded-lg hover:shadow-sm transition-all flex items-center justify-center gap-1.5 text-xs font-semibold" title="링크 추가">
+                                <span class="material-symbols-outlined text-lg">link</span>
+                                <span>링크</span>
+                            </button>
+                            <button type="button" id="tool-btn-youtube" class="flex-1 py-2 text-on-surface-variant hover:text-primary hover:bg-white rounded-lg hover:shadow-sm transition-all flex items-center justify-center gap-1.5 text-xs font-semibold" title="유튜브 링크">
+                                <span class="material-symbols-outlined text-lg">smart_display</span>
+                                <span>유튜브</span>
+                            </button>
+                            <button type="button" id="tool-btn-draw" class="flex-1 py-2 text-on-surface-variant hover:text-primary hover:bg-white rounded-lg hover:shadow-sm transition-all flex items-center justify-center gap-1.5 text-xs font-semibold" title="손그림 스케치">
+                                <span class="material-symbols-outlined text-lg">draw</span>
+                                <span>손그림</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 1. 이미지 첨부 패널 (기본 숨김) -->
+                    <div id="panel-image" class="border border-outline-variant/20 rounded-lg p-3 bg-surface-container-low/10 hidden space-y-2">
+                        <div class="flex flex-col items-center justify-center border-2 border-dashed border-outline-variant/40 rounded-lg p-3 bg-surface-container-low hover:bg-surface-container-low/80 cursor-pointer relative" id="image-dropzone">
+                            <span class="material-symbols-outlined text-outline text-2xl mb-1">image</span>
+                            <span class="text-[11px] text-on-surface-variant">파일을 드래그하거나 클릭하여 이미지 업로드</span>
+                            <span class="mt-1 text-[10px] font-semibold text-on-surface-variant">또는 복사한 이미지를 Ctrl+V로 붙여넣기</span>
+                            <input id="image-file-input" type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer"/>
+                        </div>
+                        
+                        <!-- 업로드된 이미지 미리보기 -->
+                        <div id="image-preview-container" class="hidden relative mt-2 rounded-xl overflow-hidden border border-outline-variant/30 max-h-40 bg-slate-50 flex items-center justify-center p-1">
+                            <img id="image-preview-img" src="" class="max-h-36 object-contain"/>
+                            <button type="button" id="remove-image-btn" class="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white w-7 h-7 rounded-full flex items-center justify-center">
+                                <span class="material-symbols-outlined text-xs">close</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. 웹/유튜브 링크 패널 (기본 숨김) -->
+                    <div id="panel-link" class="border border-outline-variant/20 rounded-lg p-3 bg-surface-container-low/10 hidden space-y-2">
+                        <input id="link-url-input" class="w-full px-3 py-2 bg-white border border-outline-variant/30 rounded-lg text-xs outline-none focus:ring-1 focus:ring-primary" placeholder="인터넷 주소"/>
+                        
+                        <!-- 링크 미리보기 카드 -->
+                        <div id="link-preview-box" class="hidden p-3 bg-white border border-outline-variant/30 rounded-xl flex items-center gap-3">
+                            <div id="link-preview-img-box" class="w-14 h-14 bg-slate-100 rounded overflow-hidden shrink-0 hidden">
+                                <img id="link-preview-thumbnail" src="" class="w-full h-full object-cover"/>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h5 id="link-preview-title" class="font-semibold text-xs truncate text-on-surface"></h5>
+                                <p id="link-preview-desc" class="text-[10px] text-on-surface-variant truncate mt-0.5"></p>
+                            </div>
+                            <button type="button" id="remove-link-btn" class="text-on-surface-variant hover:text-error">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. 손그림 스케치 패널 (기본 숨김) -->
+                    <div id="panel-youtube" class="border border-outline-variant/20 rounded-lg p-3 bg-surface-container-low/10 hidden space-y-2">
+                        <input id="youtube-url-input" class="w-full px-3 py-2 bg-white border border-outline-variant/30 rounded-lg text-xs outline-none focus:ring-1 focus:ring-primary" placeholder="유튜브 주소 입력"/>
+                        <div id="youtube-preview-box" class="hidden p-3 bg-white border border-outline-variant/30 rounded-xl flex items-center gap-3">
+                            <img id="youtube-preview-thumbnail" class="w-20 h-12 rounded object-cover bg-slate-100" alt="유튜브 미리보기"/>
+                            <span class="min-w-0 flex-1 text-xs font-semibold">유튜브 동영상</span>
+                            <button type="button" id="remove-youtube-btn" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-lg">delete</span></button>
+                        </div>
+                    </div>
+
+                    <div id="panel-draw" class="border border-outline-variant/20 rounded-lg p-3 bg-surface-container-low/10 hidden space-y-3 text-center">
+                        <div id="sketch-thumbnail-container" class="hidden relative rounded-xl border border-outline-variant/30 overflow-hidden bg-white max-h-40 max-w-[200px] mx-auto p-1">
+                            <img id="sketch-thumbnail-img" src="" class="object-contain w-full max-h-36"/>
+                            <button type="button" id="remove-sketch-btn" class="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white w-7 h-7 rounded-full flex items-center justify-center">
+                                <span class="material-symbols-outlined text-xs">close</span>
+                            </button>
+                        </div>
+                        <button type="button" id="open-drawing-pad-btn" class="bg-secondary text-on-secondary py-2 px-4 rounded-xl text-xs font-semibold hover:bg-secondary/95 transition-all inline-flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">draw</span>
+                            <span>손그림 드로잉 패드 열기</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- 하단 옵션 -->
+                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/10 pt-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-on-surface-variant/80">배경</span>
+                        <div class="flex items-center gap-2">
+                            <button type="button" data-bg="bg-surface-container-lowest" class="w-8 h-8 rounded-full border-2 border-primary bg-white flex items-center justify-center relative shadow-sm hover:scale-110 transition-all bg-select-btn">
+                                <span class="material-symbols-outlined text-base text-primary">check</span>
+                            </button>
+                            <button type="button" data-bg="bg-amber-100/80" class="w-8 h-8 rounded-full border-2 border-transparent bg-amber-100 shadow-sm hover:scale-110 transition-all bg-select-btn"></button>
+                            <button type="button" data-bg="bg-emerald-100/80" class="w-8 h-8 rounded-full border-2 border-transparent bg-emerald-100 shadow-sm hover:scale-110 transition-all bg-select-btn"></button>
+                            <button type="button" data-bg="bg-sky-100/80" class="w-8 h-8 rounded-full border-2 border-transparent bg-sky-100 shadow-sm hover:scale-110 transition-all bg-select-btn"></button>
+                            <button type="button" data-bg="bg-fuchsia-100/80" class="w-8 h-8 rounded-full border-2 border-transparent bg-fuchsia-100 shadow-sm hover:scale-110 transition-all bg-select-btn"></button>
+                        </div>
+                    </div>
+                    <div id="modal-section-wrapper" class="hidden min-w-0 flex-1">
+                        <div id="modal-section-select-container" class="flex flex-wrap justify-end gap-1.5">
+                            <!-- 동적으로 등록된 섹션 리스트 버튼들이 이곳에 렌더링됩니다 -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="note-section" value=""/>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex gap-3 pt-2">
+                    <button type="button" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-on-surface-variant font-bold transition-all active:scale-95 text-sm modal-close-btn">취소</button>
+                    <button type="submit" id="submit-note-btn" disabled class="flex-[2] bg-gradient-to-r from-primary to-[#7c3aed] text-on-primary px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all active:scale-95 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:active:scale-100 disabled:shadow-none disabled:transform-none">
+                        <span id="submit-btn-text">생각 올리기</span>
+                        <span class="material-symbols-outlined text-base">rocket_launch</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. 드로잉(손그림) 패드 모달 -->
+    <div id="drawing-modal" class="fixed inset-0 z-[60] flex items-center justify-center px-4 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <!-- Modal Content -->
+        <div class="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-outline-variant/20 flex flex-col animate-modal">
+            
+            <div class="p-5 border-b border-outline-variant/10 flex items-center justify-between">
+                <div>
+                    <h4 class="font-semibold text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">draw</span>
+                        스케치 그리기
+                    </h4>
+                </div>
+                <button type="button" id="close-drawing-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Canvas Area -->
+            <div class="p-6 bg-slate-100 flex items-center justify-center">
+                <canvas id="drawing-canvas" width="400" height="300" class="bg-white rounded-xl shadow-md max-w-full touch-none"></canvas>
+            </div>
+
+            <!-- Controls -->
+            <div class="p-4 border-t border-outline-variant/10 space-y-4 bg-surface-container-low">
+                <!-- Color & Size tools -->
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <!-- 색상 브러시 선택 -->
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" data-color="#000000" class="w-6 h-6 rounded-full bg-black ring-2 ring-offset-2 ring-primary brush-color-btn"></button>
+                        <button type="button" data-color="#ef4444" class="w-6 h-6 rounded-full bg-red-500 brush-color-btn"></button>
+                        <button type="button" data-color="#3b82f6" class="w-6 h-6 rounded-full bg-blue-500 brush-color-btn"></button>
+                        <button type="button" data-color="#10b981" class="w-6 h-6 rounded-full bg-emerald-500 brush-color-btn"></button>
+                        <button type="button" data-color="#f59e0b" class="w-6 h-6 rounded-full bg-amber-500 brush-color-btn"></button>
+                        <button type="button" id="eraser-btn" class="w-6 h-6 rounded-lg bg-slate-200 border border-slate-400 flex items-center justify-center" title="지우개">
+                            <span class="material-symbols-outlined text-xs text-slate-700">ink_eraser</span>
+                        </button>
+                    </div>
+
+                    <!-- 펜 굵기 슬라이더 -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-on-surface-variant">브러시 두께</span>
+                        <input id="brush-size" type="range" min="1" max="15" value="4" class="w-24 accent-primary"/>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 justify-end border-t border-outline-variant/10 pt-3">
+                    <button type="button" id="clear-canvas-btn" class="px-4 py-2 border border-outline text-on-surface-variant rounded-xl text-xs font-semibold hover:bg-slate-200 transition-all flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">refresh</span>
+                        지우기
+                    </button>
+                    <button type="button" id="save-drawing-btn" class="px-5 py-2 bg-primary text-on-primary rounded-xl text-xs font-semibold shadow-md hover:bg-primary/95 transition-all">
+                        그림 추가하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 우측 설정 사이드 패널 (Drawer) -->
+    <div id="settings-panel" class="fixed inset-y-0 right-0 z-50 w-80 bg-surface-container-lowest border-l border-outline-variant/30 shadow-2xl transition-transform duration-300 ease-in-out translate-x-full flex flex-col">
+        <!-- 패널 헤더 -->
+        <div class="p-5 border-b border-outline-variant/10 flex items-center justify-between">
+            <h4 class="font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">settings</span>
+                보드 설정
+            </h4>
+            <button type="button" id="close-settings-panel-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high text-on-surface-variant" title="설정 닫기">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <!-- 패널 바디 -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar text-sm">
+
+
+            <!-- 보드 공유하기 영역 -->
+            <div class="space-y-3 border-b border-outline-variant/10 pb-5">
+                <h5 class="font-semibold text-on-surface flex items-center gap-1.5 text-xs text-outline">
+                    <span class="material-symbols-outlined text-base">share</span>
+                    보드 공유
+                </h5>
+
+                <label class="block space-y-1.5">
+                    <span class="font-semibold text-xs text-on-surface">메모 정렬</span>
+                    <select id="note-sort-select" class="w-full rounded-lg border border-outline-variant/30 bg-surface px-3 py-2 text-xs font-semibold text-on-surface outline-none focus:ring-1 focus:ring-primary">
+                        <option value="newest">최신순</option><option value="oldest">오래된순</option><option value="likes_desc">좋아요 많은순</option><option value="comments_desc">댓글 많은순</option>
+                    </select>
+                </label>
+                <label class="block space-y-1.5"><span class="font-semibold text-xs text-on-surface">메모 배치</span><select id="note-layout-select" class="w-full rounded-lg border border-outline-variant/30 bg-surface px-3 py-2 text-xs font-semibold"><option value="masonry">빈틈없이 채우기</option><option value="grid">줄 맞춰 정렬하기</option></select></label>
+                <button type="button" id="open-share-modal-btn" class="w-full bg-primary/10 hover:bg-primary/20 text-primary py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-base">qr_code_2</span>
+                    <span>QR 코드 및 링크 공유</span>
+                </button>
+            </div>
+
+            <!-- 보드 기능 토글 영역 -->
+            <div id="board-settings-locked" class="hidden rounded-xl bg-surface-container-low p-4 text-center text-xs font-semibold text-on-surface-variant">
+                교사 로그인 후 설정할 수 있습니다.
+            </div>
+
+            <div id="board-settings-controls" class="space-y-4">
+                <h5 class="font-semibold text-on-surface flex items-center gap-1.5 text-xs text-outline">
+                    <span class="material-symbols-outlined text-base">tune</span>
+                    보드 설정
+                </h5>
+
+                <!-- 섹션 기능(칸반 뷰) 토글 -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-semibold text-xs text-on-surface">섹션</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                        <input id="toggle-section-view" class="sr-only peer" type="checkbox"/>
+                        <div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+
+                <!-- 글쓰기 기능 토글 -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-semibold text-xs text-on-surface">글쓰기 기능</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                        <input id="toggle-auth-write" class="sr-only peer" type="checkbox"/>
+                        <div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+
+                <!-- 댓글 표시 토글 -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-semibold text-xs text-on-surface">댓글 표시</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                        <input id="toggle-show-comments" class="sr-only peer" type="checkbox"/>
+                        <div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+
+                <!-- 좋아요 표시 토글 -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-semibold text-xs text-on-surface">좋아요 표시</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                        <input id="toggle-show-likes" class="sr-only peer" type="checkbox"/>
+                        <div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+
+                <!-- 보드 배경색 변경 -->
+                <div class="space-y-2 pt-2 border-t border-outline-variant/10">
+                    <p class="font-semibold text-xs text-on-surface">보드 배경색</p>
+                    <div class="flex items-center gap-2.5">
+                        <!-- Default (Light Blue) -->
+                        <button type="button" class="board-bg-btn w-6 h-6 rounded-full border border-outline-variant bg-[#f8f9ff] relative flex items-center justify-center transition-all hover:scale-110" data-bg="default" title="기본 하늘색">
+                        </button>
+                        <!-- Cream -->
+                        <button type="button" class="board-bg-btn w-6 h-6 rounded-full border border-outline-variant bg-[#faf7f0] relative flex items-center justify-center transition-all hover:scale-110" data-bg="cream" title="크림색">
+                        </button>
+                        <!-- Green -->
+                        <button type="button" class="board-bg-btn w-6 h-6 rounded-full border border-outline-variant bg-[#f1f6f2] relative flex items-center justify-center transition-all hover:scale-110" data-bg="green" title="녹색">
+                        </button>
+                        <!-- Pink -->
+                        <button type="button" class="board-bg-btn w-6 h-6 rounded-full border border-outline-variant bg-[#faf0ee] relative flex items-center justify-center transition-all hover:scale-110" data-bg="pink" title="분홍색">
+                        </button>
+                        <!-- Purple -->
+                        <button type="button" class="board-bg-btn w-6 h-6 rounded-full border border-outline-variant bg-[#f6f3f8] relative flex items-center justify-center transition-all hover:scale-110" data-bg="purple" title="보라색">
+                        </button>
+                    </div>
+                </div>
+                <!-- 텍스트 분석 (워드 클라우드) -->
+                <div class="space-y-2 pt-4 border-t border-outline-variant/10">
+                    <p class="font-semibold text-xs text-on-surface">텍스트 분석</p>
+                    <button type="button" id="open-wordcloud-btn" class="w-full bg-primary hover:bg-primary/95 text-white py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-md shadow-primary/10 active:scale-95">
+                        <span class="material-symbols-outlined text-base">cloud</span>
+                        <span>워드 클라우드 분석</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+
+    <!-- 설정 패널 뒷면 배경 레이어 (오버레이) -->
+    <div id="settings-panel-overlay" class="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm hidden transition-opacity duration-300"></div>
+
+    <!-- 이미지 확대 보기 모달 (Lightbox) -->
+    <div id="image-lightbox-modal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm hidden flex items-center justify-center p-2 md:p-4">
+        <!-- 닫기 버튼 (우측 상단) -->
+        <button id="close-lightbox-btn" class="absolute top-4 right-4 text-white hover:text-outline-variant p-2 rounded-full hover:bg-white/10 transition-colors z-50 bg-black/20" title="닫기">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+        <!-- 이미지 컨테이너 -->
+        <div class="max-w-[96vw] max-h-[95vh] flex flex-col items-center justify-center relative">
+            <img id="lightbox-img" src="" class="max-w-full max-h-[84vh] rounded-xl object-contain shadow-2xl" alt="확대 이미지"/>
+            <!-- 하단 캡션 및 다운로드 영역 -->
+            <div class="flex items-center justify-between gap-4 mt-3 w-full px-2">
+                <p id="lightbox-caption" class="text-white text-xs font-medium bg-black/40 px-3 py-1.5 rounded-full truncate flex-1 mr-4 hidden"></p>
+                <button type="button" id="download-lightbox-btn" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0" title="이미지 다운로드">
+                    <span class="material-symbols-outlined text-sm">download</span>
+                    <span>다운로드</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application core logic script -->
+    <script src="js/supabase_config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js?v=1.0.1"></script>
+    <script src="js/boards.js"></script>
+    <script src="js/section-utils.js"></script>
+    <script src="js/sections.js"></script>
+    <script src="js/board-settings-utils.js?v=1.0.1"></script>
+    <script src="js/board-settings.js?v=1.0.1"></script>
+    <script src="js/likes.js"></script>
+    <script src="js/attachment-utils.js?v=1.0.0"></script>
+    <script src="js/drawing-utils.js"></script>
+    <script src="js/masonry-utils.js"></script>
+    <script src="js/note-visibility-utils.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js"></script>
+    <script src="js/app.js?v=1.0.8"></script>
+</body>
+</html>
